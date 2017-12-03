@@ -24,7 +24,8 @@ static void Main(string[] args)
 
             Console.WriteLine("Result: " + result.Result);
             Console.ReadKey();
-        }```
+        }
+```
 
 # Links
 - Website  http://www.dxsdata.com/2017/12/arsoft-tools-netstandard
