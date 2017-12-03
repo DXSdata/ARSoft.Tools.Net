@@ -27,18 +27,26 @@ namespace ARSoft.Tools.Net.Dns
 
 		internal DhcpIRecord() {}
 
-		public DhcpIRecord(string name, int timeToLive, byte[] recordData)
-			: base(name, RecordType.DhcpI, RecordClass.INet, timeToLive)
+		public DhcpIRecord(DomainName name, int timeToLive, byte[] recordData)
+			: base(name, RecordType.Dhcid, RecordClass.INet, timeToLive)
 		{
 			RecordData = recordData ?? new byte[] { };
 		}
 
-		internal override void ParseRecordData(byte[] resultData, int startPosition, int length)
-		{
-			RecordData = DnsMessageBase.ParseByteData(resultData, ref startPosition, length);
-		}
+        internal override void ParseRecordData(byte[] resultData, int startPosition, int length)
+        {
+            RecordData = DnsMessageBase.ParseByteData(resultData, ref startPosition, length);
+        }
 
-		internal override string RecordDataToString()
+        internal override void ParseRecordData(DomainName origin, string[] stringRepresentation)
+        {
+            if (stringRepresentation.Length < 1)
+                throw new FormatException();
+
+            RecordData = String.Join(String.Empty, stringRepresentation).FromBase64String();
+        }
+
+        internal override string RecordDataToString()
 		{
 			return RecordData.ToBase64String();
 		}
@@ -48,9 +56,9 @@ namespace ARSoft.Tools.Net.Dns
 			get { return RecordData.Length; }
 		}
 
-		protected internal override void EncodeRecordData(byte[] messageData, int offset, ref int currentPosition, Dictionary<string, ushort> domainNames)
-		{
-			DnsMessageBase.EncodeByteArray(messageData, ref currentPosition, RecordData);
-		}
-	}
+        protected internal override void EncodeRecordData(byte[] messageData, int offset, ref int currentPosition, Dictionary<DomainName, ushort> domainNames, bool useCanonical)
+        {
+            DnsMessageBase.EncodeByteArray(messageData, ref currentPosition, RecordData);
+        }
+    }
 }
